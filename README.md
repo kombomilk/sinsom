@@ -1,0 +1,1 @@
+## SOM algorithm for sine function
