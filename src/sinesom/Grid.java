@@ -5,7 +5,7 @@
 package sinesom;
 
 /**
- *
+ * Grid
  * @author sergey
  */
 public class Grid {
@@ -31,14 +31,27 @@ public class Grid {
         }
     }
     
+    /**
+     * Returns the value of the last node
+     * @return 
+     */
     public double getEnd() {
+        // this works only for one row
         return start + step*columns;
     }
     
+    /**
+     * Returns the value of the first node
+     * @return 
+     */
     public double getStart() {
         return start;
     }
     
+    /**
+     * Returns the step between two neighbor nodes
+     * @return 
+     */
     public double getStep() {
         return step;
     }
@@ -50,17 +63,8 @@ public class Grid {
      */
     public void processData(double[] dataItem) {
         Node bmu = findBestMatchingUnit(dataItem);
-        updateBMU(bmu, dataItem);
+        if (bmu == null) return;
         updateNeighbours(bmu, dataItem);
-    }
-
-    /**
-     * Update value of best matching unit
-     *
-     * @param bmu
-     */
-    public void updateBMU(Node bmu, double[] dataItem) {
-        bmu.updateValue(dataItem, 0);
     }
 
     /**
@@ -69,17 +73,19 @@ public class Grid {
      * @param bmu
      */
     public void updateNeighbours(Node bmu, double[] dataItem) {
-        for (int i = (int) Math.max(0, bmu.getColumn() - getCurrentRadius());
-                i < Math.min(columns, bmu.getColumn() + getCurrentRadius()); i++) {
-            map[0][i].updateValue(dataItem, bmu.getColumn() - i);
+        double radius = getCurrentRadius();
+        for (int i = (int) Math.max(0, bmu.getColumn() - radius);
+                i < Math.min(columns, bmu.getColumn() + radius); i++) {
+            map[0][i].updateValue(dataItem, bmu.getColumn() - i, radius);
         }
     }
 
     public Node findBestMatchingUnit(double[] dataVector) {
-        Node bmu = map[0][0];
-        double bmuDistance = bmu.getDistance(dataVector);
+        Node bmu = null;
         // specific for this case
-        for (int j = 1; j < columns; j++) {
+        for (int j = 0; j < columns; j++) {
+            if (bmu == null) bmu = map[0][j];
+            double bmuDistance = bmu.getDistance(dataVector);
             double currentDistance = map[0][j].getDistance(dataVector);
             if (currentDistance < bmuDistance) {
                 bmu = map[0][j];
@@ -101,22 +107,25 @@ public class Grid {
     }
 
     public static double getLearningRate() {
-        if (SineSOM.iteration < 400) {
+        if (SineSOM.iteration < 800) {
             return 1;
         } else {
             return 0.02;
         }
+//        return 1;
 //        return SineSOM.START_LEARNING_RATE
 //                * Math.exp(-SineSOM.iteration / SineSOM.getInputDimension());
     }
 
-    public static double getNodeRatio(int distance) {
-        return Math.exp(-Utils.square(distance)
-                / (2 * Utils.getExponent(SineSOM.iteration, SineSOM.getInputDimension())));
+    public static double getNodeRatio(int distance, double radius) {
+        double sigma = radius;
+        return Math.exp(-Utils.square(distance) / Utils.square(sigma));
+//        return 1;
     }
 
     private double getCurrentRadius() {
         return Math.max(rows, columns) / 2 * Utils.getExponent(
                 SineSOM.iteration, SineSOM.getInputDimension());
+//        return 2;
     }
 }

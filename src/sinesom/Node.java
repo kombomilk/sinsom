@@ -14,24 +14,32 @@ public class Node {
     private int column;
     private double[] weights;
     private int dimension;
+    private boolean updated;
 
     public Node(int row, int column, double xValue) {
 
         this.row = row;
         this.column = column;
         this.dimension = 2;
+        updated = false;
         weights = new double[dimension];
 
         weights[0] = xValue;
         weights[1] = Utils.initialWeight();
+//        weights[1] = 0;
     }
 
-    public void updateValue(double[] dataItem, int distance) {
+    public void updateValue(double[] dataItem, int distance, double radius) {
         double[] newWeights = new double[dimension];
-        newWeights[0] = weights[0];
-        newWeights[1] = (dataItem[1] - weights[1]) * Grid.getLearningRate()
-                * Grid.getNodeRatio(distance);
+        double ratio = Grid.getNodeRatio(distance, radius);
+        double learningRate = Grid.getLearningRate();
+        
+        newWeights[0] = (dataItem[0] - weights[0]) * learningRate * ratio;        
+        newWeights[0] += weights[0];
+        
+        newWeights[1] = (dataItem[1] - weights[1]) * learningRate * ratio;
         newWeights[1] += weights[1];
+        
         weights = newWeights;
     }
 
@@ -41,6 +49,10 @@ public class Node {
 
     public int getRow() {
         return row;
+    }
+    
+    public boolean isUpdated() {
+        return updated;
     }
 
     public int getColumn() {

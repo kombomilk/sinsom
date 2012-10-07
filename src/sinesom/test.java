@@ -14,8 +14,12 @@ public class test {
         return (int) Math.floor(Math.random() * limit);
     }
     
+    public static double exp(double num) {
+        return Math.exp(num);
+    }
+    
     public static void main(String[] args) {
-        System.out.println(random(2));
+        System.out.println(exp(4));
     }
     
 }

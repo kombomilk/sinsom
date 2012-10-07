@@ -16,7 +16,7 @@ public class Utils {
      * @return 
      */
     public static double initialWeight() {
-        return Math.random();
+        return Math.random() * 2 - 1;
     }
     
     /**
@@ -37,7 +37,7 @@ public class Utils {
     }
     
     public static double getExponent(int iteration, int totalIterations) {
-        return Math.exp(- iteration / totalIterations);
+        return Math.exp(- (double) iteration / totalIterations);
     }
     
     // Mathematical functions
